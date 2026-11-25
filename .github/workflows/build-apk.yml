@@ -23,13 +23,11 @@ jobs:
       - name: Iconos con la portada
         run: |
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
-          cp -r icons/* android/app/src/main/res/
-      - name: Quitar miniatura de arranque
-        run: cp -r android-res/* android/app/src/main/res/
-      - run: npx cap sync android
-      - name: Compilar APK
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v4
+      - name: Build Android App Bundle
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew bundleRelease
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: historia-purisima-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: app-release-aab
+          path: android/app/build/outputs/bundle/release/*.aab
