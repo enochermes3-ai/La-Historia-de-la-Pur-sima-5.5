@@ -27,6 +27,11 @@ jobs:
       - run: npm install
       - run: npx cap add android
 
+      - name: Set minSdkVersion to 24
+        run: |
+          sed -i 's/minSdkVersion.*/minSdkVersion = 24/' android/variables.gradle || true
+          sed -i 's/minSdkVersion .*/minSdkVersion 24/' android/app/build.gradle
+
       - name: Iconos con la portada
         run: |
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
