@@ -27,8 +27,20 @@ jobs:
       - run: npm install
       - run: npx cap add android
 
-      - name: Set minSdkVersion to 24
+      - name: Set package ID and minSdkVersion
         run: |
+          node -e '
+            const fs = require("fs");
+            const cfgPath = "capacitor.config.json";
+            if (fs.existsSync(cfgPath)) {
+              const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
+              cfg.appId = "com.app.historiapurisima";
+              fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2) + "\n");
+            }
+          '
+          npx cap sync android
+          sed -i 's/applicationId "[^"]*"/applicationId "com.app.historiapurisima"/' android/app/build.gradle
+          sed -i 's/namespace "[^"]*"/namespace "com.app.historiapurisima"/' android/app/build.gradle
           sed -i 's/minSdkVersion.*/minSdkVersion = 24/' android/variables.gradle || true
           sed -i 's/minSdkVersion .*/minSdkVersion 24/' android/app/build.gradle
 
