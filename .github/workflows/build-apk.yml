@@ -22,12 +22,12 @@ jobs:
 
       - uses: android-actions/setup-android@v3
         with:
-          packages: ''
+          packages: 'platforms;android-36 build-tools;36.0.0'
 
       - run: npm install
       - run: npx cap add android
 
-      - name: Set package ID and minSdkVersion
+      - name: Set package ID and SDK versions
         run: |
           node -e '
             const fs = require("fs");
@@ -43,6 +43,10 @@ jobs:
           sed -i 's/namespace "[^"]*"/namespace "com.app.historiapurisima"/' android/app/build.gradle
           sed -i 's/minSdkVersion.*/minSdkVersion = 24/' android/variables.gradle || true
           sed -i 's/minSdkVersion .*/minSdkVersion 24/' android/app/build.gradle
+          sed -i 's/compileSdkVersion.*/compileSdkVersion = 36/' android/variables.gradle || true
+          sed -i 's/targetSdkVersion.*/targetSdkVersion = 36/' android/variables.gradle || true
+          sed -i 's/compileSdk .*/compileSdk 36/' android/app/build.gradle
+          sed -i 's/targetSdk .*/targetSdk 36/' android/app/build.gradle
 
       - name: Iconos con la portada
         run: |
