@@ -1,31 +1,52 @@
 name: Build APK
+
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - uses: android-actions/setup-android@v3
         with:
           packages: ''
+
       - run: npm install
       - run: npx cap add android
+
       - name: Iconos con la portada
         run: |
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
+
       - name: Build Android App Bundle
         working-directory: android
         run: chmod +x gradlew && ./gradlew bundleRelease
+
+      - name: Sign Android App Bundle
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/purisima-release-key.jks
+          AAB_PATH=$(ls android/app/build/outputs/bundle/release/*.aab | head -n 1)
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android/app/purisima-release-key.jks -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" "$AAB_PATH" "$KEY_ALIAS"
+          rm -f android/app/purisima-release-key.jks
+
       - name: Upload AAB Artifact
         uses: actions/upload-artifact@v4
         with:
