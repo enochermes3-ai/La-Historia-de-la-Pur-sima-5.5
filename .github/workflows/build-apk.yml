@@ -27,7 +27,7 @@ jobs:
       - run: npm install
       - run: npx cap add android
 
-      - name: Set package ID and SDK versions
+      - name: Set package ID, SDK versions and versionCode 2
         run: |
           node -e '
             const fs = require("fs");
@@ -41,6 +41,8 @@ jobs:
           npx cap sync android
           sed -i 's/applicationId "[^"]*"/applicationId "com.app.historiapurisima"/' android/app/build.gradle
           sed -i 's/namespace "[^"]*"/namespace "com.app.historiapurisima"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9]*/versionCode 2/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "1.0.1"/' android/app/build.gradle
           sed -i 's/minSdkVersion.*/minSdkVersion = 24/' android/variables.gradle || true
           sed -i 's/minSdkVersion .*/minSdkVersion 24/' android/app/build.gradle
           sed -i 's/compileSdkVersion.*/compileSdkVersion = 36/' android/variables.gradle || true
